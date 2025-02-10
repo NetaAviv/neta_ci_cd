@@ -1,1 +1,1 @@
-hf
+i didnt make it yet, but i think the main thing we need to do is the same as the other yaml file but the state of the packages should be absent like so - "state: absent"
