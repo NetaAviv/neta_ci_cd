@@ -1,0 +1,107 @@
+- name: Setup web server
+  hosts: all
+  become: True
+  gather_facts: True
+#  vars_files:
+#    - group_vars/env
+#    - group_vars/colman.env
+#    - group_vars/docker.env
+
+  tasks:
+   - name: install epel-release package
+     yum:
+       name:
+         - epel-release
+       state: present
+   - name: install git
+     yum:
+       name:
+         - git
+       state: present
+   - name: install python-pip
+     yum:
+       name:
+         - python-pip
+       state: present
+   - name: install yum-utils
+     yum:
+       name:
+         - yum-utils
+       state: present
+   - name: Install device-mapper-persistent-data
+     yum:
+       name: device-mapper-persistent-data
+       state: latest
+
+   - name: Install lvm2
+     yum:
+       name: lvm2
+       state: latest
+
+   - name: Add Docker repo
+     get_url:
+       url: https://download.docker.com/linux/centos/docker-ce.repo
+       dest: /etc/yum.repos.d/docer-ce.repo
+     become: yes
+
+   - name: Enable Docker Edge repo
+     ini_file:
+       dest: /etc/yum.repos.d/docer-ce.repo
+       section: 'docker-ce-edge'
+       option: enabled
+       value: 0
+     become: yes
+
+   - name: Enable Docker Test repo
+     ini_file:
+       dest: /etc/yum.repos.d/docer-ce.repo
+       section: 'docker-ce-test'
+       option: enabled
+       value: 0
+     become: yes
+
+   - name: Install Docker
+     package:
+       name: docker-ce
+       state: latest
+     become: yes
+
+   - name: Start Docker service
+     service:
+       name: docker
+       state: started
+       enabled: yes
+     become: yes
+
+   - name: Add user ec2-user to docker group
+     user:
+       name: ec2-user
+       groups: docker
+       append: yes
+     become: yes
+
+   - name: copy ssh
+     copy: 
+       src: /home/ec2-user/neta_project/netakey.pem 
+       dest: /home/ec2-user/.ssh/netakey.pem 
+       mode: 0600
+   - name: copy my github repo
+     git:
+       repo: https://github.com/NetaAviv/neta_ci-cd.git
+       dest: /home/ec2-user/my_repo
+     #shell: git clone https://github.com/NetaAviv/neta_ci-cd.git /home/ec2-user/my_repo
+   - name: Login to my dockerhub Repository
+     docker_login:
+       registry: netaaviv/netasfinal
+       username: netaaviv
+       password: 71427142a
+   - name: "Build Docker image from Dockerfile"
+     docker_image:
+       build:
+         path: "/home/ec2-user/my_repo"
+       name: "new_image"
+       tag: "{{ item }}"
+       push: yes
+       source: local
+     with_items:
+       - "latest"
