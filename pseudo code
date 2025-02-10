@@ -1,0 +1,26 @@
+1. make a github repo with src directory, ansible directory and Jenkinsfile
+  the src directory contains: 
+  - app.py file 
+  - requirement file 
+  - Dockerfile 
+  - Docker-compose
+	the ansible directory contains:
+  - create-infra.yaml
+  - destroy-infra.yaml
+2. get my ansible master server ready to run ansible playbook:
+- install ansible and git (to be able to clone the repo)
+- make a inventory file (with ssh key)
+- clone the ansible directory from the github repo
+3. run the ansible playbook to get the infra ready against the inventory file i made including:
+- installing packages using yum package manager
+- cloning the repo i made in github to the production server 
+- building an image out of the dockerfile
+- pushing that image to dockerhub
+4. The Jenkinsfile in the github repo will run as a pipeline on the jenkins server. the pipeline will be triggered by changes in the repo. the pipeline will contain the following:
+- get the app from the github repo
+- built the app (including requirements) everytime there is a new change 
+- unit test?
+- run the ansible create-infra.yml playbook to create an updated image in docker hub
+- run the new image from docker hub on the production server using docker-compose 
+- post: write success on screen 
+5. run the jenkinsfile and make sure everything works fine by checking our production server for our app!
