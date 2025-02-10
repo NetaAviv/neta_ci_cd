@@ -1,3 +1,4 @@
+#this jenkinsfile looks at the github repo every 5 minutes and if any changes where made it builds the image based on the dockerfile tests it and add it to dockerhub (without using the ansible we wrote) 
 pipeline {
     agent any
 
