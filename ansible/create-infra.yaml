@@ -93,8 +93,8 @@
    - name: Login to my dockerhub Repository
      docker_login:
        registry: netaaviv/netasfinal
-       username: netaaviv
-       password: 71427142a
+       username: ---
+       password: ---
    - name: "Build Docker image from Dockerfile"
      docker_image:
        build:
